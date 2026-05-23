@@ -2,7 +2,7 @@
 
 A Python toolkit for game designers to wrangle spreadsheet-based game data. It converts `.xlsx`/`.xlsm` workbooks to structured `.json` (and back), extracts localizable text, and validates data against JSON Schema. Eventual goal: import generated data directly into Unreal Engine assets.
 
-This is a Python port of [GameDataManager.jl](./GameDataManager), preserving its config format and conversion semantics so existing projects can move over without rewriting their `config.json`.
+This is a Python port of [GameDataManager.jl](https://github.com/YongHee-Kim/GameDataManager.jl), preserving its config format and conversion semantics so existing projects can move over without rewriting their `config.json`.
 
 ## Why
 
