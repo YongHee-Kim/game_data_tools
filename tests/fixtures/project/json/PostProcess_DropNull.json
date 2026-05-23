@@ -1,0 +1,14 @@
+[
+  {
+    "Key": 1,
+    "ExpectedReward": "{\"GameplayTag\":Id.Loot.A;\"Count\":1};{\"GameplayTag\":Id.Loot.B;\"Count\":2}"
+  },
+  {
+    "Key": 2,
+    "ExpectedReward": "{\"GameplayTag\":Id.Loot.X;\"Count\":5}"
+  },
+  {
+    "Key": 3,
+    "ExpectedReward": null
+  }
+]

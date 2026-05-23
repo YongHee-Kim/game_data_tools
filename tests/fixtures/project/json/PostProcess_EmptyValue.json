@@ -1,0 +1,17 @@
+[
+  {
+    "Key": 1,
+    "Description": "First item",
+    "Requirements": 10
+  },
+  {
+    "Key": 2,
+    "Description": "",
+    "Requirements": 0
+  },
+  {
+    "Key": 3,
+    "Description": "Third",
+    "Requirements": 0
+  }
+]

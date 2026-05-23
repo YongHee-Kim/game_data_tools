@@ -1,0 +1,107 @@
+[
+  {
+    "Key": 1,
+    "Attributes": [
+      "Str",
+      50
+    ],
+    "Sepciality": [
+      "Power",
+      "2"
+    ],
+    "Numbers": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "Integers": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "Key": 2,
+    "Attributes": [
+      "Dex",
+      10
+    ],
+    "Sepciality": [
+      "Speed",
+      "15"
+    ],
+    "Numbers": [
+      4.0,
+      5.0,
+      6.0
+    ],
+    "Integers": [
+      4,
+      5,
+      6
+    ]
+  },
+  {
+    "Key": 3,
+    "Attributes": [
+      "Str",
+      15
+    ],
+    "Sepciality": [
+      "Knowledge",
+      "6"
+    ],
+    "Numbers": [
+      7.0,
+      8.0,
+      9.0
+    ],
+    "Integers": [
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "Key": 4,
+    "Attributes": [
+      "Crit",
+      20
+    ],
+    "Sepciality": [
+      "Hammer",
+      "11"
+    ],
+    "Numbers": [
+      10.0,
+      11.0,
+      12.0
+    ],
+    "Integers": [
+      10,
+      11,
+      12
+    ]
+  },
+  {
+    "Key": 5,
+    "Attributes": [
+      "Dex",
+      25
+    ],
+    "Sepciality": [
+      "Axe",
+      "7"
+    ],
+    "Numbers": [
+      13.0,
+      14.0,
+      15.0
+    ],
+    "Integers": [
+      13,
+      14,
+      15
+    ]
+  }
+]

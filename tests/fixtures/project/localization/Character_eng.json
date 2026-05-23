@@ -1,0 +1,14 @@
+{
+  "$gamedata.Character.UIText.1.Bard": "Bard sings ;a song, but doesn't dance",
+  "$gamedata.Character.UIText.2.Bard": "Bard sings ",
+  "$gamedata.Character.UIText.3.Bard": "a song, but doesn't dance",
+  "$gamedata.Character.UIText.1.Wizard": "Wizard can cast;a spell",
+  "$gamedata.Character.UIText.2.Wizard": "Wizard can cast",
+  "$gamedata.Character.UIText.3.Wizard": "a spell",
+  "$gamedata.Character.UIText.1.Warrior": "Warrior yields;the sword",
+  "$gamedata.Character.UIText.2.Warrior": "Warrior yields",
+  "$gamedata.Character.UIText.3.Warrior": "the sword",
+  "$gamedata.Character.UIText.1.Archer": "Archer fire arrows;with a bow",
+  "$gamedata.Character.UIText.2.Archer": "Archer fire arrows",
+  "$gamedata.Character.UIText.3.Archer": "with a bow"
+}

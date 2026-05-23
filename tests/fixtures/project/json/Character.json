@@ -1,0 +1,54 @@
+[
+  {
+    "Key": "Bard",
+    "$UIText": [
+      "Bard sings ;a song, but doesn't dance",
+      "Bard sings ",
+      "a song, but doesn't dance"
+    ],
+    "UIText": [
+      "$gamedata.Character.UIText.1.Bard",
+      "$gamedata.Character.UIText.2.Bard",
+      "$gamedata.Character.UIText.3.Bard"
+    ]
+  },
+  {
+    "Key": "Wizard",
+    "$UIText": [
+      "Wizard can cast;a spell",
+      "Wizard can cast",
+      "a spell"
+    ],
+    "UIText": [
+      "$gamedata.Character.UIText.1.Wizard",
+      "$gamedata.Character.UIText.2.Wizard",
+      "$gamedata.Character.UIText.3.Wizard"
+    ]
+  },
+  {
+    "Key": "Warrior",
+    "$UIText": [
+      "Warrior yields;the sword",
+      "Warrior yields",
+      "the sword"
+    ],
+    "UIText": [
+      "$gamedata.Character.UIText.1.Warrior",
+      "$gamedata.Character.UIText.2.Warrior",
+      "$gamedata.Character.UIText.3.Warrior"
+    ]
+  },
+  {
+    "Key": "Archer",
+    "$UIText": [
+      "Archer fire arrows;with a bow",
+      "Archer fire arrows",
+      "with a bow"
+    ],
+    "UIText": [
+      "$gamedata.Character.UIText.1.Archer",
+      "$gamedata.Character.UIText.2.Archer",
+      "$gamedata.Character.UIText.3.Archer"
+    ]
+  }
+]

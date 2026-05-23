@@ -1,0 +1,6 @@
+Key,$Name,Attributes,Nested,Name
+1,This data,[Str;50],{"Value1":Apple;"Value2":Grape},$gamedata.TestData_Csv.Name.1
+2,Will be exported as CSV,[Dex;10],{"Value1":Gold;"Value2":Silver},$gamedata.TestData_Csv.Name.2
+3,due to its limitation,[Str;15],{"Value1":Time;"Value2":Space},$gamedata.TestData_Csv.Name.3
+4,array and object,[Crit;20],{"Value1":Hot;"Value2":Cold},$gamedata.TestData_Csv.Name.4
+5,will be concanated as single string,[Dex;25],{"Value1":Green;"Value2":Blue},$gamedata.TestData_Csv.Name.5

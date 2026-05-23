@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r \"E:\\\\Depot\\\\Github\\\\game_data_tools\\\\GameDataManager\\\\test\\\\project\" \"E:\\\\Depot\\\\Github\\\\game_data_tools\\\\tests\\\\fixtures\\\\project\")",
+      "Bash(cp -r \"E:\\\\Depot\\\\Github\\\\game_data_tools\\\\GameDataManager\\\\test\\\\data\" \"E:\\\\Depot\\\\Github\\\\game_data_tools\\\\tests\\\\fixtures\\\\data\")"
+    ]
+  }
+}

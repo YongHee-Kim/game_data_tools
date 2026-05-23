@@ -1,0 +1,14 @@
+[
+  {
+    "Key": "POT001",
+    "Name": "Small Potion",
+    "Heal": 25,
+    "StackSize": 99
+  },
+  {
+    "Key": "POT002",
+    "Name": "Large Potion",
+    "Heal": 100,
+    "StackSize": 50
+  }
+]

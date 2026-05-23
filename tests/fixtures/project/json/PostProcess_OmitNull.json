@@ -1,0 +1,28 @@
+[
+  {
+    "Key": 1,
+    "ExpectedReward": [
+      {
+        "Id": "Id.Loot.A",
+        "Count": 1
+      },
+      {
+        "Id": "Id.Loot.B",
+        "Count": 2
+      }
+    ]
+  },
+  {
+    "Key": 2,
+    "ExpectedReward": [
+      {
+        "Id": "Id.Loot.X",
+        "Count": 5
+      }
+    ]
+  },
+  {
+    "Key": 3,
+    "ExpectedReward": []
+  }
+]

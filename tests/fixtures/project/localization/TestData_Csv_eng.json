@@ -1,0 +1,7 @@
+{
+  "$gamedata.TestData_Csv.Name.1": "This data",
+  "$gamedata.TestData_Csv.Name.2": "Will be exported as CSV",
+  "$gamedata.TestData_Csv.Name.3": "due to its limitation",
+  "$gamedata.TestData_Csv.Name.4": "array and object",
+  "$gamedata.TestData_Csv.Name.5": "will be concanated as single string"
+}

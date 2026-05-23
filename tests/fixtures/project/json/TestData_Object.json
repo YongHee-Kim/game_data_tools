@@ -1,0 +1,57 @@
+[
+  {
+    "Key": 1,
+    "Attributes": {
+      "Stat": "Str",
+      "Value": 50
+    },
+    "Speciality": {
+      "Type": "Power",
+      "Value": 2
+    }
+  },
+  {
+    "Key": 2,
+    "Attributes": {
+      "Stat": "Dex",
+      "Value": 10
+    },
+    "Speciality": {
+      "Type": "Speed",
+      "Value": 15
+    }
+  },
+  {
+    "Key": 3,
+    "Attributes": {
+      "Stat": "Str",
+      "Value": 15
+    },
+    "Speciality": {
+      "Type": "Knowledge",
+      "Value": 6
+    }
+  },
+  {
+    "Key": 4,
+    "Attributes": {
+      "Stat": "Crit",
+      "Value": 20
+    },
+    "Speciality": {
+      "Type": "Hammer",
+      "Value": 11
+    }
+  },
+  {
+    "Key": 5,
+    "Attributes": {
+      "Stat": "Dex",
+      "Value": 25
+    },
+    "Speciality": {
+      "Type": "Axe",
+      "Value": 7
+    }
+  }
+]
