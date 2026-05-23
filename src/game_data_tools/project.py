@@ -9,6 +9,7 @@ from typing import Iterable
 from . import config as _config
 from . import schema
 from .config import Config, WorkbookSpec
+from .workbook import JSONWorkbook
 from .worksheet import JSONWorksheet
 
 
@@ -68,28 +69,37 @@ class Project:
         return results
 
     def import_json(self, name: str, *, strict: bool = False) -> ImportResult:
-        """Rewrite one workbook's .xlsx from the converted .json files on disk."""
+        """Rewrite one workbook's .xlsx from the converted .json files on disk.
+
+        Opens the destination xlsx once and saves once after all sheets have
+        been written, so a workbook with N sheets does not pay N read+write
+        cycles. If every sheet fails, the xlsx is left untouched.
+        """
         wb_spec = self.config.workbook(name)
         xlsx_path = self.config.environment.xlsx / wb_spec.filename
+        xlsx_path.parent.mkdir(parents=True, exist_ok=True)
 
         written_sheets: list[str] = []
         errors: list[tuple[str, Exception]] = []
 
-        for ws_spec in wb_spec.worksheets:
-            json_path = self.config.environment.out / ws_spec.out
-            try:
-                if json_path.suffix.lower() != ".json":
-                    raise ValueError(
-                        f"json -> xlsx only supports .json sources; got {json_path.name}"
-                    )
-                ws = JSONWorksheet.from_json(json_path, sheet_name=ws_spec.name)
-                start_line = int(ws_spec.kwargs.get("start_line", 1))
-                ws.write_xlsx(xlsx_path, start_line=start_line)
-                written_sheets.append(ws_spec.name)
-            except Exception as exc:
-                if strict:
-                    raise
-                errors.append((ws_spec.name, exc))
+        with JSONWorkbook.open_for_write(xlsx_path) as jwb:
+            for ws_spec in wb_spec.worksheets:
+                try:
+                    json_path = self.config.environment.out / ws_spec.out
+                    if json_path.suffix.lower() != ".json":
+                        raise ValueError(
+                            f"json -> xlsx only supports .json sources; got {json_path.name}"
+                        )
+                    ws = JSONWorksheet.from_json(json_path, sheet_name=ws_spec.name)
+                    start_line = int(ws_spec.kwargs.get("start_line", 1))
+                    jwb.write_sheet(ws, start_line=start_line)
+                    written_sheets.append(ws_spec.name)
+                except Exception as exc:
+                    if strict:
+                        raise
+                    errors.append((ws_spec.name, exc))
+            if written_sheets:
+                jwb.save()
 
         return ImportResult(
             workbook=wb_spec.filename,
@@ -107,20 +117,21 @@ class Project:
         skipped: list[Path] = []
         errors: list[tuple[str, Exception]] = []
 
-        for ws_spec in wb.worksheets:
-            out_path = self.config.environment.out / ws_spec.out
-            try:
-                ws = JSONWorksheet.read(xlsx_path, ws_spec.name, **ws_spec.kwargs)
-                if self.config.environment.jsonschema is not None:
-                    schema.validate(
-                        self.config.environment.jsonschema, ws_spec.out, ws.rows
-                    )
-                changed = ws.write(out_path)
-                (written if changed else skipped).append(out_path)
-            except Exception as exc:
-                if strict:
-                    raise
-                errors.append((ws_spec.name, exc))
+        with JSONWorkbook.open_for_read(xlsx_path) as jwb:
+            for ws_spec in wb.worksheets:
+                out_path = self.config.environment.out / ws_spec.out
+                try:
+                    ws = jwb.read_sheet(ws_spec.name, **ws_spec.kwargs)
+                    if self.config.environment.jsonschema is not None:
+                        schema.validate(
+                            self.config.environment.jsonschema, ws_spec.out, ws.rows
+                        )
+                    changed = ws.write(out_path)
+                    (written if changed else skipped).append(out_path)
+                except Exception as exc:
+                    if strict:
+                        raise
+                    errors.append((ws_spec.name, exc))
 
         return ExportResult(
             workbook=wb.filename,

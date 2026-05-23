@@ -22,8 +22,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
-from openpyxl import Workbook, load_workbook
-
 from . import pointer
 
 
@@ -52,6 +50,21 @@ class JSONWorksheet:
         cls,
         xlsx_path: Path,
         sheet_name: str,
+        **kwargs: Any,
+    ) -> "JSONWorksheet":
+        """Open ``xlsx_path`` and read one sheet. For batched multi-sheet runs,
+        open a ``JSONWorkbook`` once and call ``read_sheet`` per sheet instead."""
+        from .workbook import JSONWorkbook
+
+        with JSONWorkbook.open_for_read(xlsx_path) as jwb:
+            return jwb.read_sheet(sheet_name, **kwargs)
+
+    @classmethod
+    def _read_from_workbook(
+        cls,
+        wb: Any,
+        source: Path,
+        sheet_name: str,
         *,
         start_line: int = 1,
         row_oriented: bool = True,
@@ -60,6 +73,7 @@ class JSONWorksheet:
         omit_null_object: bool = False,
         empty_value: dict[str, Any] | None = None,
     ) -> "JSONWorksheet":
+        """Read one sheet out of an already-open openpyxl workbook."""
         if not row_oriented:
             raise NotImplementedError("column-oriented sheets are not yet supported")
         if squeeze:
@@ -67,39 +81,35 @@ class JSONWorksheet:
         if omit_null_object:
             raise NotImplementedError("omit_null_object is not yet supported")
 
-        wb = load_workbook(xlsx_path, data_only=True, read_only=True)
-        try:
-            if sheet_name not in wb.sheetnames:
-                raise KeyError(f"worksheet {sheet_name!r} not found in {xlsx_path.name}")
-            ws = wb[sheet_name]
+        if sheet_name not in wb.sheetnames:
+            raise KeyError(f"worksheet {sheet_name!r} not found in {Path(source).name}")
+        ws = wb[sheet_name]
 
-            rows_iter = ws.iter_rows(values_only=True)
-            for _ in range(start_line - 1):
-                next(rows_iter, None)
+        rows_iter = ws.iter_rows(values_only=True)
+        for _ in range(start_line - 1):
+            next(rows_iter, None)
 
-            header_row = next(rows_iter, None)
-            if header_row is None:
-                return cls(source=xlsx_path, sheet_name=sheet_name)
+        header_row = next(rows_iter, None)
+        if header_row is None:
+            return cls(source=source, sheet_name=sheet_name)
 
-            columns = [str(c) for c in header_row if c is not None and str(c).strip()]
-            delim_re = re.compile(re.escape(delim)) if isinstance(delim, str) else re.compile(delim)
-            empty_value = empty_value or {}
+        columns = [str(c) for c in header_row if c is not None and str(c).strip()]
+        delim_re = re.compile(re.escape(delim)) if isinstance(delim, str) else re.compile(delim)
+        empty_value = empty_value or {}
 
-            rows: list[dict[str, Any]] = []
-            for raw_row in rows_iter:
-                if raw_row is None or all(v is None for v in raw_row):
-                    continue
-                obj: dict[str, Any] = {}
-                for col, value in zip(columns, raw_row):
-                    converted = _convert_cell(value, delim_re)
-                    if converted is None and col in empty_value:
-                        converted = empty_value[col]
-                    pointer.set_in(obj, pointer.normalize(col), converted)
-                rows.append(obj)
+        rows: list[dict[str, Any]] = []
+        for raw_row in rows_iter:
+            if raw_row is None or all(v is None for v in raw_row):
+                continue
+            obj: dict[str, Any] = {}
+            for col, value in zip(columns, raw_row):
+                converted = _convert_cell(value, delim_re)
+                if converted is None and col in empty_value:
+                    converted = empty_value[col]
+                pointer.set_in(obj, pointer.normalize(col), converted)
+            rows.append(obj)
 
-            return cls(source=xlsx_path, sheet_name=sheet_name, columns=columns, rows=rows)
-        finally:
-            wb.close()
+        return cls(source=source, sheet_name=sheet_name, columns=columns, rows=rows)
 
     @classmethod
     def from_json(
@@ -163,29 +173,30 @@ class JSONWorksheet:
         sheet (or adds it) and preserves other sheets. Header lands on row
         ``start_line`` so callers can mirror the original sheet's layout.
         """
+        from .workbook import JSONWorkbook
+
+        if not self.sheet_name:
+            raise ValueError("JSONWorksheet.sheet_name is required to write xlsx")
+        xlsx_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with JSONWorkbook.open_for_write(xlsx_path) as jwb:
+            jwb.write_sheet(self, start_line=start_line)
+            jwb.save()
+
+    def _write_to_workbook(self, wb: Any, *, start_line: int = 1) -> None:
+        """Replace (or add) ``self.sheet_name`` inside an already-open workbook."""
         if not self.sheet_name:
             raise ValueError("JSONWorksheet.sheet_name is required to write xlsx")
 
-        xlsx_path.parent.mkdir(parents=True, exist_ok=True)
-
-        if xlsx_path.is_file():
-            wb = load_workbook(xlsx_path)
-            if self.sheet_name in wb.sheetnames:
-                del wb[self.sheet_name]
-            sheet = wb.create_sheet(self.sheet_name)
-        else:
-            wb = Workbook()
-            default = wb.active
-            sheet = wb.create_sheet(self.sheet_name)
-            wb.remove(default)
+        if self.sheet_name in wb.sheetnames:
+            del wb[self.sheet_name]
+        sheet = wb.create_sheet(self.sheet_name)
 
         for _ in range(start_line - 1):
             sheet.append([])
         sheet.append(self.columns)
         for row in self.rows:
             sheet.append([_encode_cell(pointer.get_at(row, c)) for c in self.columns])
-
-        wb.save(xlsx_path)
 
     def _delimited(self, delim: str) -> str:
         lines = [delim.join(self.columns)]
