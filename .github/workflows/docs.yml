@@ -1,0 +1,65 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow the workflow to publish to GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; don't cancel an in-progress one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install package and dev dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Build API docs (pydoctor)
+        run: |
+          pydoctor ./src/game_data_tools \
+            --project-version "$(python -c 'import game_data_tools; print(game_data_tools.__version__)')"
+
+      - name: Build coverage report and badge
+        run: |
+          coverage run -m unittest discover -s tests
+          coverage html -d build/apidocs/coverage
+          coverage json -o build/coverage.json
+          python scripts/make_coverage_badge.py \
+            --input build/coverage.json \
+            --output build/apidocs/coverage.svg
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/apidocs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

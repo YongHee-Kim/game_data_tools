@@ -58,7 +58,7 @@ class Config:
 
 
 def load(root: Path | str) -> Config:
-    """Load `<root>/config.json` and resolve paths relative to it."""
+    """Load ``<root>/config.json`` and resolve paths relative to it."""
     root = Path(root).resolve()
     config_path = root if root.is_file() else root / "config.json"
     if not config_path.is_file():

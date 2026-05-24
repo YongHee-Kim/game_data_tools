@@ -1,5 +1,9 @@
 # game_data_tools
 
+[![Tests](https://github.com/YongHee-Kim/game_data_tools/actions/workflows/tests.yml/badge.svg)](https://github.com/YongHee-Kim/game_data_tools/actions/workflows/tests.yml)
+[![Coverage](https://yonghee-kim.github.io/game_data_tools/coverage.svg)](https://yonghee-kim.github.io/game_data_tools/coverage/)
+[![Docs](https://github.com/YongHee-Kim/game_data_tools/actions/workflows/docs.yml/badge.svg)](https://yonghee-kim.github.io/game_data_tools/)
+
 A Python toolkit for game designers to wrangle spreadsheet-based game data. It converts `.xlsx`/`.xlsm` workbooks to structured `.json` (and back), extracts localizable text, and validates data against JSON Schema. Eventual goal: import generated data directly into Unreal Engine assets.
 
 This is a Python port of [GameDataManager.jl](https://github.com/YongHee-Kim/GameDataManager.jl), preserving its config format and conversion semantics so existing projects can move over without rewriting their `config.json`.
@@ -12,13 +16,13 @@ Game designers spend most of their time wrestling with data. Spreadsheets are ea
 
 1. **xlsx → json** — Convert `.xlsx`/`.xlsm` workbooks to `.json` (or `.csv`/`.tsv`) per a project `config.json`. Supports row-oriented sheets, nested objects via JSONPointer column names, array cells with configurable delimiters, and per-column empty-cell substitution. (Column-oriented sheets and `squeeze`/`omit_null_object` post-processes are not yet implemented.)
 2. **json → xlsx** — Round-trip JSON back into a workbook, preserving column order, JSONPointer nesting, array-cell encoding, and `start_line` offsets. Other sheets in the target workbook are preserved.
-3. **Localization** — Extract `$`-prefixed columns into a separate per-language JSON file, leaving stable lookup keys in the main data. Compatible with the Julia tool's key format (`$gamedata.<file>.<column>.<key>`).
+3. **Localization** *(planned)* — Extract `$`-prefixed columns into a separate per-language JSON file, leaving stable lookup keys in the main data. Compatible with the Julia tool's key format (`$gamedata.<file>.<column>.<key>`).
 4. **JSON Schema validation** — Validate converted JSON against schemas in the project's `jsonschema/` directory.
 5. **Unreal import** *(planned)* — Emit Unreal `DataTable` JSON and/or drive an editor commandlet to import assets directly. Deferred until the json side is stable.
 
 ## Status
 
-Early scaffolding. The README defines the target API and config compatibility; implementation is in progress. See [GameDataManager/README.md](./GameDataManager/README.md) for the reference behavior being ported.
+The core pipeline is implemented and tested: `.xlsx`/`.xlsm` → `.json`/`.csv`/`.tsv` conversion (with JSONPointer columns and array cells), `.json` → `.xlsx` round-trip, JSON Schema validation, and the `gdt` CLI. Localization extraction and Unreal export are still planned — see the [Roadmap](#roadmap). Behavior is ported from [GameDataManager.jl](https://github.com/YongHee-Kim/GameDataManager.jl).
 
 ## Install
 
@@ -89,6 +93,8 @@ Path fields under `environment` may be absolute or relative to `config.json`.
 gdt convert ./MyProject                 # export every configured workbook
 gdt convert ./MyProject --file items    # export a single workbook
 gdt to-xlsx ./MyProject --file items    # reverse: json → xlsx
+gdt config  ./MyProject                 # print the resolved project config
+gdt shell   ./MyProject                 # open a persistent REPL for the project
 ```
 
 **Library:**
@@ -121,7 +127,7 @@ Column names may use JSONPointer syntax (`/character/stats/hp`) to nest values i
 
 ## Localization
 
-Mirrors GameDataManager's localizer.
+> **Planned — not yet implemented.** `localize` specs in `config.json` are parsed, but extraction does not run yet. The design below mirrors GameDataManager's localizer and documents the intended behavior.
 
 1. Prefix any column header with `$` to opt it into extraction:
 
@@ -184,7 +190,7 @@ If `environment.jsonschema` is set and a schema named `<out_basename>.json` exis
 - [ ] Unreal DataTable JSON emitter
 - [ ] Optional editor-commandlet driver for headless imports
 
-For a hands-on walkthrough of the CLI, see [tutorial/README.md](./tutorial/README.md).
+For a walkthrough of every worksheet `kwargs` option, see the [API documentation](https://yonghee-kim.github.io/game_data_tools/) (generated from the package docstrings with [pydoctor](https://pydoctor.readthedocs.io/)).
 
 ## License
 

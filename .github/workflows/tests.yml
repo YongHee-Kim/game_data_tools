@@ -1,0 +1,55 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install package and dev dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run tests under coverage
+        run: coverage run -m unittest discover -s tests -v
+
+      - name: Coverage report
+        run: coverage report -m
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo "### Coverage (Python ${{ matrix.python-version }})"
+            echo
+            coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Generate coverage artifacts
+        if: matrix.python-version == '3.13'
+        run: |
+          coverage html -d htmlcov
+          coverage xml -o coverage.xml
+
+      - name: Upload coverage HTML
+        if: matrix.python-version == '3.13'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov

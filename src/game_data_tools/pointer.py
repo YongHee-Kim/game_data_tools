@@ -16,7 +16,7 @@ def normalize(token: str) -> str:
 
 
 def set_in(obj: dict[str, Any], pointer: str, value: Any) -> None:
-    """Set a value at `pointer`, creating intermediate dicts as needed.
+    """Set a value at ``pointer``, creating intermediate dicts as needed.
 
     ``jsonpointer.JsonPointer.set`` does not auto-create parents, so we walk the
     tokens ourselves and delegate parsing/unescaping to the library.
@@ -35,5 +35,5 @@ def set_in(obj: dict[str, Any], pointer: str, value: Any) -> None:
 
 
 def get_at(obj: Any, pointer: str, default: Any = None) -> Any:
-    """Resolve `pointer` against `obj`, returning `default` for missing paths."""
+    """Resolve ``pointer`` against ``obj``, returning ``default`` for missing paths."""
     return JsonPointer(normalize(pointer)).resolve(obj, default=default)

@@ -26,7 +26,7 @@ def schema_path(schema_dir: Path, out_basename: str) -> Path:
 
 
 def validate(schema_dir: Path, out_basename: str, data: Any) -> bool:
-    """Validate `data` against the schema for `out_basename`.
+    """Validate ``data`` against the schema for ``out_basename``.
 
     Returns True if a schema was found and applied, False if no schema exists.
     Raises SchemaError on validation failure or malformed schema.

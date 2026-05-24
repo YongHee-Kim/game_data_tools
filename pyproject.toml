@@ -19,6 +19,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.6",
+    "coverage>=7.0",
+    "pydoctor>=24.0",
 ]
 
 [project.scripts]
@@ -30,3 +32,29 @@ packages = ["src/game_data_tools"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.coverage.run]
+source = ["game_data_tools"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise AssertionError",
+]
+
+[tool.pydoctor]
+project-name = "game_data_tools"
+project-url = "https://github.com/YongHee-Kim/game_data_tools"
+docformat = "restructuredtext"
+theme = "readthedocs"
+make-html = true
+html-output = "build/apidocs"
+privacy = [
+    "HIDDEN:**.tests",
+    "HIDDEN:**.tests.*",
+]
+intersphinx = ["https://docs.python.org/3/objects.inv"]

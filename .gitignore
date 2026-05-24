@@ -71,6 +71,10 @@ instance/
 # Sphinx documentation
 docs/_build/
 
+# pydoctor API docs (built into build/, also default output dir)
+/apidocs/
+coverage.json
+
 # PyBuilder
 .pybuilder/
 target/

@@ -15,7 +15,7 @@ from .worksheet import JSONWorksheet
 
 @dataclass
 class ExportResult:
-    """Outcome of converting one workbook from xlsx to its `out` files."""
+    """Outcome of converting one workbook from xlsx to its ``out`` files."""
 
     workbook: str
     written: list[Path]
@@ -44,7 +44,7 @@ class Project:
         return self.config.root
 
     def export(self, name: str | None = None, *, strict: bool = False) -> list[ExportResult]:
-        """Export one or every configured workbook from xlsx to its `out` files."""
+        """Export one or every configured workbook from xlsx to its ``out`` files."""
         workbooks: Iterable[WorkbookSpec]
         if name is None:
             workbooks = self.config.workbooks

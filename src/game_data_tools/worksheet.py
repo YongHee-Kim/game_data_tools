@@ -73,7 +73,26 @@ class JSONWorksheet:
         omit_null_object: bool = False,
         empty_value: dict[str, Any] | None = None,
     ) -> "JSONWorksheet":
-        """Read one sheet out of an already-open openpyxl workbook."""
+        """Read one sheet out of an already-open openpyxl workbook.
+
+        These keyword arguments are exactly the per-worksheet ``kwargs`` from
+        ``config.json``; see the package overview for worked examples of each.
+
+        :param start_line: 1-based row holding the column headers; rows above it
+            are skipped and data begins on the following row.
+        :param row_oriented: ``True`` reads a row-per-record sheet (the only mode
+            implemented). ``False`` (column-oriented) raises ``NotImplementedError``.
+        :param squeeze: collapse all rows into a single object. *Planned* —
+            raises ``NotImplementedError``.
+        :param delim: delimiter (string or regex source) used to split a cell into
+            an array; matching cells become lists of coerced scalars.
+        :param omit_null_object: drop array elements whose fields are all null.
+            *Planned* — raises ``NotImplementedError``.
+        :param empty_value: per-column replacement for empty cells, keyed by column
+            name or pointer; unlisted columns default empty cells to ``None``.
+        :raises NotImplementedError: when a not-yet-supported option is requested.
+        :raises KeyError: when ``sheet_name`` is absent from the workbook.
+        """
         if not row_oriented:
             raise NotImplementedError("column-oriented sheets are not yet supported")
         if squeeze:
@@ -145,9 +164,9 @@ class JSONWorksheet:
     # ---- write paths -------------------------------------------------------
 
     def write(self, out_path: Path) -> bool:
-        """Write this worksheet to `out_path`. Returns True if the file was actually written.
+        """Write this worksheet to ``out_path``. Returns True if the file was actually written.
 
-        Format is chosen from `out_path.suffix`: `.json`, `.csv`, `.tsv`.
+        Format is chosen from ``out_path.suffix``: ``.json``, ``.csv``, ``.tsv``.
         Skips the write when the rendered payload matches existing file contents.
         """
         suffix = out_path.suffix.lower()
@@ -266,7 +285,7 @@ def _encode_cell(value: Any, delim: str = DEFAULT_DELIM) -> Any:
 
 
 def _collect_columns(obj: Any, prefix: str, out: dict[str, None]) -> None:
-    """Depth-first walk of `obj`'s keys, recording column names in first-seen order."""
+    """Depth-first walk of ``obj``'s keys, recording column names in first-seen order."""
     if not isinstance(obj, dict):
         return
     for k, v in obj.items():
