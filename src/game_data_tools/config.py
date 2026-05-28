@@ -21,11 +21,49 @@ class Environment:
 
 
 @dataclass(frozen=True)
+class GameEngine:
+    """Engine-integration settings from the ``gameEngine`` block, if present."""
+
+    type: str | None = None
+    project_path: Path | None = None
+    content_root: str = "/Game"
+
+
+@dataclass(frozen=True)
+class AssetFilter:
+    """A subset of ``unreal.ARFilter`` describing which assets a worksheet maps to."""
+
+    class_paths: tuple[str, ...] = ()
+    package_paths: tuple[str, ...] = ()
+    recursive_paths: bool = False
+    recursive_classes: bool = False
+    package_names: tuple[str, ...] = ()
+    tags_and_values: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class UnrealSpec:
+    """Per-worksheet mapping between spreadsheet rows and Unreal DataAssets.
+
+    ``properties`` maps a sheet column (bare name or JSONPointer) to a UE property
+    path (dot-separated for nested struct members). The sentinels ``__name__`` and
+    ``__path__`` resolve to the asset's object name / object path.
+    """
+
+    asset_filter: AssetFilter
+    key_column: str = "/Key"
+    key_property: str = "__name__"
+    properties: dict[str, str] = field(default_factory=dict)
+    save: bool = True
+
+
+@dataclass(frozen=True)
 class WorksheetSpec:
     name: str
     out: str
     localize: dict[str, Any] | None = None
     kwargs: dict[str, Any] = field(default_factory=dict)
+    unreal: UnrealSpec | None = None
 
 
 @dataclass(frozen=True)
@@ -47,6 +85,7 @@ class Config:
     environment: Environment
     localization: Localization
     workbooks: tuple[WorkbookSpec, ...]
+    game_engine: GameEngine | None = None
 
     def workbook(self, name_or_stem: str) -> WorkbookSpec:
         """Look up a workbook by filename or stem (case-insensitive)."""
@@ -93,6 +132,16 @@ def load(root: Path | str) -> Config:
         target_languages=tuple(loc_raw.get("targetLanguage", ())),
     )
 
+    ge_raw = raw.get("gameEngine") or {}
+    game_engine = None
+    if ge_raw:
+        proj = ge_raw.get("projectPath")
+        game_engine = GameEngine(
+            type=ge_raw.get("type"),
+            project_path=_resolve(proj) if proj else None,
+            content_root=ge_raw.get("contentRoot", "/Game"),
+        )
+
     workbooks = tuple(
         WorkbookSpec(
             filename=fname,
@@ -102,6 +151,7 @@ def load(root: Path | str) -> Config:
                     out=ws["out"],
                     localize=ws.get("localize"),
                     kwargs=ws.get("kwargs", {}),
+                    unreal=_parse_unreal(ws),
                 )
                 for ws in spec.get("workSheets", [])
             ),
@@ -115,4 +165,28 @@ def load(root: Path | str) -> Config:
         environment=environment,
         localization=localization,
         workbooks=workbooks,
+        game_engine=game_engine,
+    )
+
+
+def _parse_unreal(ws_raw: dict[str, Any]) -> UnrealSpec | None:
+    """Build a `UnrealSpec` from a worksheet's ``unreal`` block, or ``None``."""
+    u = ws_raw.get("unreal")
+    if not u:
+        return None
+    f = u.get("assetFilter") or {}
+    asset_filter = AssetFilter(
+        class_paths=tuple(f.get("classPaths", ())),
+        package_paths=tuple(f.get("packagePaths", ())),
+        recursive_paths=bool(f.get("recursivePaths", False)),
+        recursive_classes=bool(f.get("recursiveClasses", False)),
+        package_names=tuple(f.get("packageNames", ())),
+        tags_and_values=dict(f.get("tagsAndValues", {})),
+    )
+    return UnrealSpec(
+        asset_filter=asset_filter,
+        key_column=u.get("keyColumn", "/Key"),
+        key_property=u.get("keyProperty", "__name__"),
+        properties=dict(u.get("properties", {})),
+        save=bool(u.get("save", True)),
     )
